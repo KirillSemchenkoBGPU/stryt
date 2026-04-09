@@ -1,0 +1,180 @@
+// Узел бинарного дерева
+class BinaryTreeNode {
+    int value;
+    BinaryTreeNode left;
+    BinaryTreeNode right;
+
+    BinaryTreeNode(int value) {
+        this.value = value;
+        this.left = null;
+        this.right = null;
+    }
+}
+
+// Класс бинарного дерева поиска (BST)
+public class BinaryTree {
+    private BinaryTreeNode root; // корень дерева
+
+    // Конструктор пустого дерева
+    public BinaryTree() {
+        this.root = null;
+    }
+
+    // Вставка узла (публичный метод)
+    public void insert(int value) {
+        if (root == null) {
+            root = new BinaryTreeNode(value);
+        } else {
+            insertRecursive(root, value);
+        }
+    }
+
+    // Рекурсивная вставка (приватный метод)
+    private void insertRecursive(BinaryTreeNode node, int value) {
+        if (value < node.value) {
+            if (node.left == null) {
+                node.left = new BinaryTreeNode(value);
+            } else {
+                insertRecursive(node.left, value);
+            }
+        } else {
+            if (node.right == null) {
+                node.right = new BinaryTreeNode(value);
+            } else {
+                insertRecursive(node.right, value);
+            }
+        }
+    }
+
+    // Поиск значения в дереве
+    public boolean search(int value) {
+        return searchRecursive(root, value);
+    }
+
+    private boolean searchRecursive(BinaryTreeNode node, int value) {
+        if (node == null) {
+            return false;
+        }
+        if (value == node.value) {
+            return true;
+        }
+        if (value < node.value) {
+            return searchRecursive(node.left, value);
+        } else {
+            return searchRecursive(node.right, value);
+        }
+    }
+
+    // Высота дерева
+    public int height() {
+        return heightRecursive(root);
+    }
+
+    private int heightRecursive(BinaryTreeNode node) {
+        if (node == null) {
+            return 0;
+        }
+        int leftHeight = heightRecursive(node.left);
+        int rightHeight = heightRecursive(node.right);
+        return Math.max(leftHeight, rightHeight) + 1;
+    }
+
+    // Создание дерева из массива (статический метод)
+    public static BinaryTree createFromArray(int[] values) {
+        BinaryTree tree = new BinaryTree();
+        for (int value : values) {
+            tree.insert(value);
+        }
+        return tree;
+    }
+
+    // ============ ОБХОДЫ ДЕРЕВА ============
+
+    // Прямой обход (корень → лево → право)
+    public void preorderTraversal() {
+        preorderRecursive(root);
+        System.out.println();
+    }
+
+    private void preorderRecursive(BinaryTreeNode node) {
+        if (node == null) return;
+        System.out.print(node.value + " ");
+        preorderRecursive(node.left);
+        preorderRecursive(node.right);
+    }
+
+    // Симметричный обход (лево → корень → право) - даёт отсортированный порядок
+    public void inorderTraversal() {
+        inorderRecursive(root);
+        System.out.println();
+    }
+
+    private void inorderRecursive(BinaryTreeNode node) {
+        if (node == null) return;
+        inorderRecursive(node.left);
+        System.out.print(node.value + " ");
+        inorderRecursive(node.right);
+    }
+
+    // Обратный обход (лево → право → корень)
+    public void postorderTraversal() {
+        postorderRecursive(root);
+        System.out.println();
+    }
+
+    private void postorderRecursive(BinaryTreeNode node) {
+        if (node == null) return;
+        postorderRecursive(node.left);
+        postorderRecursive(node.right);
+        System.out.print(node.value + " ");
+    }
+
+    // Красивый вывод дерева (с отступами)
+    public void printTree() {
+        printTreeRecursive(root, 0);
+    }
+
+    private void printTreeRecursive(BinaryTreeNode node, int level) {
+        if (node == null) return;
+        printTreeRecursive(node.right, level + 1);
+        for (int i = 0; i < level; i++) {
+            System.out.print("    ");
+        }
+        System.out.println(node.value);
+        printTreeRecursive(node.left, level + 1);
+    }
+
+    // Проверка на пустоту
+    public boolean isEmpty() {
+        return root == null;
+    }
+
+    // Главный метод с демонстрацией
+    public static void main(String[] args) {
+        System.out.println("=== Создание дерева из массива ===");
+        int[] values = {10, 5, 15, 2, 7, 12, 17, 1, 6, 8};
+        BinaryTree tree = BinaryTree.createFromArray(values);
+
+        System.out.println("\n=== Дерево (визуально) ===");
+        tree.printTree();
+
+        System.out.println("\n=== Высота дерева: " + tree.height());
+
+        System.out.println("\n=== Прямой обход (preorder):");
+        tree.preorderTraversal();
+
+        System.out.println("Симметричный обход (inorder) - отсортированный:");
+        tree.inorderTraversal();
+
+        System.out.println("Обратный обход (postorder):");
+        tree.postorderTraversal();
+
+        System.out.println("\n=== Поиск значений ===");
+        System.out.println("Найти 7: " + tree.search(7));
+        System.out.println("Найти 100: " + tree.search(100));
+
+        System.out.println("\n=== Вставка нового элемента 9 ===");
+        tree.insert(9);
+        tree.inorderTraversal();
+    }
+}
