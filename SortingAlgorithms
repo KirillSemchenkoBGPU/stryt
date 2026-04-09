@@ -5,10 +5,10 @@ import java.util.Arrays;
  * Сравнение алгоритмов сортировки
  * Быстрая сортировка (Quick Sort) vs Сортировка пузырьком (Bubble Sort)
  */
-public class SortComparison {
-    
+ class SortComparison {
+
     // ==================== БЫСТРАЯ СОРТИРОВКА (QUICK SORT) ====================
-    
+
     /**
      * Быстрая сортировка - рекурсивная реализация
      * Сложность: O(n log n) в среднем, O(n²) в худшем случае
@@ -20,7 +20,7 @@ public class SortComparison {
             quickSort(arr, pivotIndex + 1, high);
         }
     }
-    
+
     /**
      * Разбиение массива для быстрой сортировки
      * @return индекс опорного элемента
@@ -28,18 +28,18 @@ public class SortComparison {
     private static int partition(int[] arr, int low, int high) {
         int pivot = arr[high];  // опорный элемент (берём последний)
         int i = low - 1;        // индекс для меньших элементов
-        
+
         for (int j = low; j < high; j++) {
             if (arr[j] <= pivot) {
                 i++;
                 swap(arr, i, j);
             }
         }
-        
+
         swap(arr, i + 1, high);
         return i + 1;
     }
-    
+
     /**
      * Обмен элементов в массиве
      */
@@ -48,9 +48,9 @@ public class SortComparison {
         arr[i] = arr[j];
         arr[j] = temp;
     }
-    
+
     // ==================== СОРТИРОВКА ПУЗЫРЬКОМ (BUBBLE SORT) ====================
-    
+
     /**
      * Сортировка пузырьком - простая реализация
      * Сложность: O(n²) в любом случае
@@ -69,9 +69,9 @@ public class SortComparison {
             if (!swapped) break;
         }
     }
-    
+
     // ==================== ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ====================
-    
+
     /**
      * Копирование массива (чтобы не портить оригинал)
      */
@@ -80,7 +80,7 @@ public class SortComparison {
         System.arraycopy(source, 0, copy, 0, source.length);
         return copy;
     }
-    
+
     /**
      * Проверка, отсортирован ли массив
      */
@@ -92,7 +92,7 @@ public class SortComparison {
         }
         return true;
     }
-    
+
     /**
      * Генерация случайного массива
      */
@@ -104,7 +104,7 @@ public class SortComparison {
         }
         return arr;
     }
-    
+
     /**
      * Генерация почти отсортированного массива
      */
@@ -121,7 +121,7 @@ public class SortComparison {
         }
         return arr;
     }
-    
+
     /**
      * Генерация обратно отсортированного массива (худший случай для быстрой сортировки)
      */
@@ -132,7 +132,7 @@ public class SortComparison {
         }
         return arr;
     }
-    
+
     /**
      * Измерение времени выполнения
      */
@@ -142,7 +142,7 @@ public class SortComparison {
         long end = System.nanoTime();
         return end - start;
     }
-    
+
     /**
      * Форматирование времени в миллисекундах
      */
@@ -156,9 +156,9 @@ public class SortComparison {
             return String.format("%.3f с", milliseconds / 1000.0);
         }
     }
-    
+
     // ==================== ТЕСТИРОВАНИЕ ====================
-    
+
     /**
      * Тестирование на массивах разного размера
      */
@@ -167,28 +167,28 @@ public class SortComparison {
         System.out.println("║                    СРАВНЕНИЕ АЛГОРИТМОВ СОРТИРОВКИ                             ║");
         System.out.println("║                    Быстрая сортировка (O(n log n)) vs Пузырёк (O(n²))          ║");
         System.out.println("╚════════════════════════════════════════════════════════════════════════════════╝\n");
-        
+
         // Размеры массивов для тестирования
         int[] sizes = {10, 100, 500, 1000, 5000, 10000, 50000, 100000};
-        
+
         System.out.println("┌───────────┬──────────────────────────────┬──────────────────────────────┬─────────────┐");
         System.out.println("│   Размер  │      Быстрая сортировка      │      Сортировка пузырьком    │  Ускорение  │");
         System.out.println("│   массива │          (Quick Sort)         │          (Bubble Sort)       │ (раз)       │");
         System.out.println("├───────────┼──────────────────────────────┼──────────────────────────────┼─────────────┤");
-        
+
         for (int size : sizes) {
             // Генерируем случайный массив
             int[] original = generateRandomArray(size);
-            
+
             // Тестируем быструю сортировку
             int[] arrForQuick = copyArray(original);
             long timeQuick = measureTime(() -> quickSort(arrForQuick, 0, arrForQuick.length - 1));
-            
+
             // Тестируем сортировку пузырьком (только для небольших массивов, иначе слишком долго)
             long timeBubble;
             String bubbleTimeStr;
             String speedupStr;
-            
+
             if (size <= 10000) {
                 int[] arrForBubble = copyArray(original);
                 long startBubble = System.nanoTime();
@@ -196,7 +196,7 @@ public class SortComparison {
                 long endBubble = System.nanoTime();
                 timeBubble = endBubble - startBubble;
                 bubbleTimeStr = formatTime(timeBubble);
-                
+
                 double speedup = (double) timeBubble / timeQuick;
                 speedupStr = String.format("~%.0fx", speedup);
             } else {
@@ -204,24 +204,24 @@ public class SortComparison {
                 bubbleTimeStr = "❌ слишком долго";
                 speedupStr = "—";
             }
-            
+
             // Проверка корректности сортировки
             boolean quickCorrect = isSorted(arrForQuick);
             boolean bubbleCorrect = (size <= 10000) ? isSorted(copyArray(original)) : true;
-            
+
             String quickMark = quickCorrect ? "✓" : "✗";
             String bubbleMark = (size <= 10000 && bubbleCorrect) ? "✓" : "";
-            
-            System.out.printf("│ %9d │ %25s %s │ %24s %s │ %11s │%n", 
-                size, 
-                formatTime(timeQuick), quickMark,
-                bubbleTimeStr, bubbleMark,
-                speedupStr);
+
+            System.out.printf("│ %9d │ %25s %s │ %24s %s │ %11s │%n",
+                    size,
+                    formatTime(timeQuick), quickMark,
+                    bubbleTimeStr, bubbleMark,
+                    speedupStr);
         }
-        
+
         System.out.println("└───────────┴──────────────────────────────┴──────────────────────────────┴─────────────┘");
     }
-    
+
     /**
      * Детальное тестирование с разными типами данных
      */
@@ -229,26 +229,26 @@ public class SortComparison {
         System.out.println("\n\n╔════════════════════════════════════════════════════════════════════════════════╗");
         System.out.println("║                         ДЕТАЛЬНОЕ ТЕСТИРОВАНИЕ                                ║");
         System.out.println("╚════════════════════════════════════════════════════════════════════════════════╝\n");
-        
+
         int size = 10000;
-        
+
         System.out.println("Тестирование на массиве размером " + size + " элементов:\n");
-        
+
         // 1. Случайный массив
         System.out.println("1. СЛУЧАЙНЫЙ МАССИВ:");
         int[] randomArray = generateRandomArray(size);
         testOnArray(randomArray, "Случайный массив");
-        
+
         // 2. Почти отсортированный массив
         System.out.println("\n2. ПОЧТИ ОТСОРТИРОВАННЫЙ МАССИВ (10 перестановок):");
         int[] nearlySorted = generateNearlySortedArray(size, 10);
         testOnArray(nearlySorted, "Почти отсортированный");
-        
+
         // 3. Обратно отсортированный массив
         System.out.println("\n3. ОБРАТНО ОТСОРТИРОВАННЫЙ МАССИВ (худший случай для быстрой сортировки):");
         int[] reversed = generateReversedArray(size);
         testOnArray(reversed, "Обратно отсортированный");
-        
+
         // 4. Массив с повторяющимися элементами
         System.out.println("\n4. МАССИВ С ПОВТОРЯЮЩИМИСЯ ЭЛЕМЕНТАМИ:");
         int[] duplicates = new int[size];
@@ -258,7 +258,7 @@ public class SortComparison {
         }
         testOnArray(duplicates, "Массив с дубликатами");
     }
-    
+
     /**
      * Тестирование на одном массиве
      */
@@ -267,25 +267,25 @@ public class SortComparison {
         int[] arrQuick = copyArray(original);
         long timeQuick = measureTime(() -> quickSort(arrQuick, 0, arrQuick.length - 1));
         boolean quickCorrect = isSorted(arrQuick);
-        
+
         // Сортировка пузырьком
         int[] arrBubble = copyArray(original);
         long timeBubble = measureTime(() -> bubbleSort(arrBubble));
         boolean bubbleCorrect = isSorted(arrBubble);
-        
-        System.out.printf("   %-25s %15s %s %n", 
-            "Быстрая сортировка:", 
-            formatTime(timeQuick),
-            quickCorrect ? "✓" : "✗");
-        System.out.printf("   %-25s %15s %s %n", 
-            "Сортировка пузырьком:", 
-            formatTime(timeBubble),
-            bubbleCorrect ? "✓" : "✗");
-        
+
+        System.out.printf("   %-25s %15s %s %n",
+                "Быстрая сортировка:",
+                formatTime(timeQuick),
+                quickCorrect ? "✓" : "✗");
+        System.out.printf("   %-25s %15s %s %n",
+                "Сортировка пузырьком:",
+                formatTime(timeBubble),
+                bubbleCorrect ? "✓" : "✗");
+
         double speedup = (double) timeBubble / timeQuick;
         System.out.printf("   %-25s %15.2f x %n", "Ускорение:", speedup);
     }
-    
+
     /**
      * Демонстрация работы алгоритмов на маленьком массиве
      */
@@ -293,37 +293,37 @@ public class SortComparison {
         System.out.println("\n\n╔════════════════════════════════════════════════════════════════════════════════╗");
         System.out.println("║                         ДЕМОНСТРАЦИЯ НА МАЛЕНЬКОМ МАССИВЕ                      ║");
         System.out.println("╚════════════════════════════════════════════════════════════════════════════════╝\n");
-        
+
         int[] arr = {64, 34, 25, 12, 22, 11, 90, 5, 77, 33};
-        
+
         System.out.println("Исходный массив: " + Arrays.toString(arr));
-        
+
         // Быстрая сортировка
         int[] quickArr = copyArray(arr);
         quickSort(quickArr, 0, quickArr.length - 1);
         System.out.println("После быстрой сортировки: " + Arrays.toString(quickArr));
-        
+
         // Сортировка пузырьком
         int[] bubbleArr = copyArray(arr);
         bubbleSort(bubbleArr);
         System.out.println("После сортировки пузырьком: " + Arrays.toString(bubbleArr));
-        
+
         // Проверка
         System.out.println("\nОба алгоритма отсортировали массив корректно!");
     }
-    
+
     // ==================== MAIN ====================
-    
+
     public static void main(String[] args) {
         // Демонстрация на маленьком массиве
         demoOnSmallArray();
-        
+
         // Основные тесты на разных размерах
         runTests();
-        
+
         // Детальное тестирование
         detailedTest();
-        
+
         // Вывод итогового заключения
         System.out.println("\n\n╔════════════════════════════════════════════════════════════════════════════════╗");
         System.out.println("║                              ВЫВОДЫ                                           ║");
