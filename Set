@@ -1,0 +1,429 @@
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+/**
+ * Множество (Set) - коллекция уникальных элементов
+ * Реализация на основе связного списка
+ * @param <T> тип элементов (должен реализовывать Comparable для проверки равенства)
+ */
+public class Set<T extends Comparable<T>> implements Iterable<T> {
+    
+    /**
+     * Узел связного списка для хранения элементов
+     */
+    private static class Node<T> {
+        T data;
+        Node<T> next;
+        
+        Node(T data) {
+            this.data = data;
+            this.next = null;
+        }
+    }
+    
+    private Node<T> head;  // первый элемент множества
+    private int size;      // количество элементов
+    
+    /**
+     * Конструктор - создаёт пустое множество
+     */
+    public Set() {
+        head = null;
+        size = 0;
+    }
+    
+    /**
+     * Конструктор - создаёт множество с начальными элементами
+     * @param items коллекция начальных элементов
+     */
+    public Set(Iterable<T> items) {
+        this();
+        addRange(items);
+    }
+    
+    /**
+     * Добавление элемента в множество
+     * @param item добавляемый элемент
+     * @throws IllegalStateException если элемент уже существует в множестве
+     * Сложность: O(n)
+     */
+    public void add(T item) {
+        if (contains(item)) {
+            throw new IllegalStateException("Item already exists in Set: " + item);
+        }
+        
+        Node<T> newNode = new Node<>(item);
+        newNode.next = head;
+        head = newNode;
+        size++;
+    }
+    
+    /**
+     * Добавление нескольких элементов в множество
+     * @param items коллекция добавляемых элементов
+     * @throws IllegalStateException если какой-либо элемент уже существует
+     * Сложность: O(m * n)
+     */
+    public void addRange(Iterable<T> items) {
+        for (T item : items) {
+            add(item);
+        }
+    }
+    
+    /**
+     * Удаление элемента из множества
+     * @param item удаляемый элемент
+     * @return true если элемент был удалён, false если не найден
+     * Сложность: O(n)
+     */
+    public boolean remove(T item) {
+        if (head == null) {
+            return false;
+        }
+        
+        // Если удаляем первый элемент
+        if (head.data.equals(item)) {
+            head = head.next;
+            size--;
+            return true;
+        }
+        
+        // Ищем элемент в остальной части списка
+        Node<T> current = head;
+        while (current.next != null && !current.next.data.equals(item)) {
+            current = current.next;
+        }
+        
+        if (current.next != null) {
+            current.next = current.next.next;
+            size--;
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Проверка наличия элемента в множестве
+     * @param item искомый элемент
+     * @return true если элемент есть в множестве, иначе false
+     * Сложность: O(n)
+     */
+    public boolean contains(T item) {
+        Node<T> current = head;
+        while (current != null) {
+            if (current.data.equals(item)) {
+                return true;
+            }
+            current = current.next;
+        }
+        return false;
+    }
+    
+    /**
+     * Количество элементов в множестве
+     */
+    public int size() {
+        return size;
+    }
+    
+    /**
+     * Проверка на пустоту
+     */
+    public boolean isEmpty() {
+        return size == 0;
+    }
+    
+    /**
+     * Очистка множества
+     * Сложность: O(1)
+     */
+    public void clear() {
+        head = null;
+        size = 0;
+    }
+    
+    /**
+     * Объединение множеств (Union)
+     * @param other другое множество
+     * @return новое множество, содержащее элементы из обоих множеств
+     * Сложность: O(m * n)
+     */
+    public Set<T> union(Set<T> other) {
+        Set<T> result = new Set<>();
+        
+        // Добавляем все элементы из текущего множества
+        for (T item : this) {
+            result.add(item);
+        }
+        
+        // Добавляем элементы из другого множества, которых ещё нет
+        for (T item : other) {
+            if (!contains(item)) {
+                result.add(item);
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Пересечение множеств (Intersection)
+     * @param other другое множество
+     * @return новое множество, содержащее элементы, присутствующие в обоих множествах
+     * Сложность: O(m * n)
+     */
+    public Set<T> intersection(Set<T> other) {
+        Set<T> result = new Set<>();
+        
+        for (T item : this) {
+            if (other.contains(item)) {
+                result.add(item);
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Разность множеств (Difference)
+     * @param other другое множество
+     * @return новое множество, содержащее элементы текущего множества,
+     *         которых нет в другом множестве
+     * Сложность: O(m * n)
+     */
+    public Set<T> difference(Set<T> other) {
+        Set<T> result = new Set<>();
+        
+        for (T item : this) {
+            if (!other.contains(item)) {
+                result.add(item);
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Симметрическая разность (Symmetric Difference)
+     * @param other другое множество
+     * @return новое множество, содержащее элементы,
+     *         присутствующие только в одном из множеств
+     * Сложность: O(m * n)
+     */
+    public Set<T> symmetricDifference(Set<T> other) {
+        // A Δ B = (A \ B) ∪ (B \ A)
+        Set<T> result = new Set<>();
+        
+        // Элементы из текущего множества, которых нет в другом
+        for (T item : this) {
+            if (!other.contains(item)) {
+                result.add(item);
+            }
+        }
+        
+        // Элементы из другого множества, которых нет в текущем
+        for (T item : other) {
+            if (!contains(item)) {
+                result.add(item);
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Проверка, является ли текущее множество подмножеством другого
+     * @param other другое множество
+     * @return true если все элементы текущего множества есть в другом
+     * Сложность: O(m * n)
+     */
+    public boolean isSubsetOf(Set<T> other) {
+        for (T item : this) {
+            if (!other.contains(item)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    /**
+     * Проверка, является ли текущее множество надмножеством другого
+     * @param other другое множество
+     * @return true если все элементы другого множества есть в текущем
+     * Сложность: O(m * n)
+     */
+    public boolean isSupersetOf(Set<T> other) {
+        return other.isSubsetOf(this);
+    }
+    
+    /**
+     * Преобразование в массив
+     */
+    @SuppressWarnings("unchecked")
+    public T[] toArray() {
+        T[] array = (T[]) new Comparable[size];
+        Node<T> current = head;
+        for (int i = 0; i < size; i++) {
+            array[i] = current.data;
+            current = current.next;
+        }
+        return array;
+    }
+    
+    /**
+     * Итератор для перебора элементов множества
+     * Сложность: получение итератора - O(1), обход - O(n)
+     */
+    @Override
+    public Iterator<T> iterator() {
+        return new Iterator<T>() {
+            private Node<T> current = head;
+            
+            @Override
+            public boolean hasNext() {
+                return current != null;
+            }
+            
+            @Override
+            public T next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
+                T data = current.data;
+                current = current.next;
+                return data;
+            }
+        };
+    }
+    
+    /**
+     * Строковое представление множества
+     */
+    @Override
+    public String toString() {
+        if (isEmpty()) {
+            return "Set[]";
+        }
+        StringBuilder sb = new StringBuilder("Set[");
+        Node<T> current = head;
+        while (current != null) {
+            sb.append(current.data);
+            if (current.next != null) {
+                sb.append(", ");
+            }
+            current = current.next;
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+    
+    /**
+     * Демонстрация работы множества
+     */
+    public static void main(String[] args) {
+        System.out.println("=== Демонстрация работы множества (Set) ===\n");
+        
+        // Создание множества делителей числа 100
+        System.out.println("1. Создание множества делителей числа 100:");
+        Set<Integer> divisors100 = new Set<>();
+        int[] divisors = {1, 2, 4, 5, 10, 20, 25, 50, 100};
+        for (int d : divisors) {
+            divisors100.add(d);
+        }
+        System.out.println("   Делители 100: " + divisors100);
+        System.out.println("   Размер: " + divisors100.size());
+        
+        // Создание множества нечётных чисел
+        System.out.println("\n2. Создание множества нечётных чисел (1-20):");
+        Set<Integer> oddNumbers = new Set<>();
+        for (int i = 1; i <= 20; i += 2) {
+            oddNumbers.add(i);
+        }
+        System.out.println("   Нечётные числа: " + oddNumbers);
+        
+        // Пересечение - нечётные делители 100
+        System.out.println("\n3. Пересечение (нечётные делители 100):");
+        Set<Integer> oddDivisors = divisors100.intersection(oddNumbers);
+        System.out.println("   Нечётные делители 100: " + oddDivisors);
+        
+        // Разность - чётные делители 100
+        System.out.println("\n4. Разность (чётные делители 100):");
+        Set<Integer> evenDivisors = divisors100.difference(oddNumbers);
+        System.out.println("   Чётные делители 100: " + evenDivisors);
+        
+        // Объединение
+        System.out.println("\n5. Объединение:");
+        Set<Integer> anotherSet = new Set<>();
+        anotherSet.add(3);
+        anotherSet.add(6);
+        anotherSet.add(9);
+        anotherSet.add(12);
+        System.out.println("   Множество A: " + divisors100);
+        System.out.println("   Множество B: " + anotherSet);
+        System.out.println("   A ∪ B: " + divisors100.union(anotherSet));
+        
+        // Симметрическая разность
+        System.out.println("\n6. Симметрическая разность:");
+        Set<Integer> setA = new Set<>();
+        setA.add(1);
+        setA.add(2);
+        setA.add(3);
+        setA.add(4);
+        
+        Set<Integer> setB = new Set<>();
+        setB.add(3);
+        setB.add(4);
+        setB.add(5);
+        setB.add(6);
+        
+        System.out.println("   A: " + setA);
+        System.out.println("   B: " + setB);
+        System.out.println("   A Δ B: " + setA.symmetricDifference(setB));
+        
+        // Проверка на подмножество
+        System.out.println("\n7. Проверка на подмножество:");
+        Set<Integer> subset = new Set<>();
+        subset.add(2);
+        subset.add(4);
+        System.out.println("   Множество: " + setA);
+        System.out.println("   Подмножество: " + subset);
+        System.out.println("   Является подмножеством? " + subset.isSubsetOf(setA));
+        
+        // Работа со строками
+        System.out.println("\n8. Работа с множеством строк:");
+        Set<String> employees = new Set<>();
+        employees.add("Иванов");
+        employees.add("Петров");
+        employees.add("Сидоров");
+        employees.add("Козлов");
+        System.out.println("   Все сотрудники: " + employees);
+        
+        Set<String> certified = new Set<>();
+        certified.add("Петров");
+        certified.add("Козлов");
+        System.out.println("   Прошедшие проверку: " + certified);
+        
+        Set<String> notCertified = employees.difference(certified);
+        System.out.println("   Не прошедшие проверку: " + notCertified);
+        
+        // Итерация по множеству
+        System.out.println("\n9. Итерация по множеству:");
+        System.out.print("   Элементы множества: ");
+        for (Integer num : divisors100) {
+            System.out.print(num + " ");
+        }
+        System.out.println();
+        
+        // Проверка исключений
+        System.out.println("\n10. Проверка исключений:");
+        Set<Integer> testSet = new Set<>();
+        testSet.add(42);
+        System.out.println("   Множество: " + testSet);
+        try {
+            testSet.add(42);
+        } catch (IllegalStateException e) {
+            System.out.println("   Ошибка при добавлении дубликата: " + e.getMessage());
+        }
+    }
+}
