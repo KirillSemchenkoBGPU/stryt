@@ -1,0 +1,125 @@
+// Класс узла связного списка (статический, чтобы не было лишней ссылки на Queue)
+class Node<T> {
+    T data;
+    Node<T> next;
+
+    Node(T data) {
+        this.data = data;
+        this.next = null;
+    }
+}
+
+// Класс очереди (FIFO)
+public class Queue<T> {
+    private Node<T> front;  // начало очереди (удаление)
+    private Node<T> rear;   // конец очереди (добавление)
+    private int size;       // количество элементов
+
+    // Конструктор
+    public Queue() {
+        front = null;
+        rear = null;
+        size = 0;
+    }
+
+    // Добавление элемента в конец очереди - O(1)
+    public void enqueue(T item) {
+        Node<T> newNode = new Node<>(item);
+        if (rear == null) {
+            front = rear = newNode;
+        } else {
+            rear.next = newNode;
+            rear = newNode;
+        }
+        size++;
+    }
+
+    // Удаление и возврат элемента из начала очереди - O(1)
+    public T dequeue() {
+        if (isEmpty()) {
+            throw new RuntimeException("Queue is empty");
+        }
+        T item = front.data;
+        front = front.next;
+        if (front == null) {
+            rear = null;
+        }
+        size--;
+        return item;
+    }
+
+    // Просмотр первого элемента без удаления - O(1)
+    public T peek() {
+        if (isEmpty()) {
+            throw new RuntimeException("Queue is empty");
+        }
+        return front.data;
+    }
+
+    // Проверка на пустоту - O(1)
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
+    // Возврат количества элементов - O(1)
+    public int size() {
+        return size;
+    }
+
+    // Очистка очереди - O(1)
+    public void clear() {
+        front = null;
+        rear = null;
+        size = 0;
+    }
+
+    // Красивый вывод содержимого очереди (без удаления)
+    @Override
+    public String toString() {
+        if (isEmpty()) {
+            return "Queue[]";
+        }
+        StringBuilder sb = new StringBuilder("Queue[");
+        Node<T> current = front;
+        while (current != null) {
+            sb.append(current.data);
+            if (current.next != null) {
+                sb.append(", ");
+            }
+            current = current.next;
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    // Тестовый запуск (улучшенный, чтобы показать все методы)
+    public static void main(String[] args) {
+        Queue<Integer> queue = new Queue<>();
+
+        System.out.println("=== Добавляем элементы ===");
+        queue.enqueue(10);
+        queue.enqueue(20);
+        queue.enqueue(30);
+        System.out.println("Очередь: " + queue);
+        System.out.println("Размер: " + queue.size());
+
+        System.out.println("\n=== Просмотр и удаление ===");
+        System.out.println("Первый элемент (peek): " + queue.peek());
+        System.out.println("Удаляем: " + queue.dequeue());
+        System.out.println("Очередь после удаления: " + queue);
+
+        System.out.println("\n=== Удаляем всё ===");
+        while (!queue.isEmpty()) {
+            System.out.println("Извлечено: " + queue.dequeue());
+        }
+        System.out.println("Пустая? " + queue.isEmpty());
+
+        System.out.println("\n=== Проверка clear() ===");
+        queue.enqueue(100);
+        queue.enqueue(200);
+        System.out.println("До clear: " + queue);
+        queue.clear();
+        System.out.println("После clear: " + queue);
+        System.out.println("Размер: " + queue.size());
+    }
+}
