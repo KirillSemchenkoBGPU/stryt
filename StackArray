@@ -1,0 +1,213 @@
+/**
+ * Узел стека (связный список)
+ * @param <T> тип хранимых данных
+ */
+class StackNode<T> {
+    T data;
+    StackNode<T> next;
+
+    StackNode(T data) {
+        this.data = data;
+        this.next = null;
+    }
+}
+
+/**
+ * Стек (LIFO) на основе связного списка
+ * @param <T> тип хранимых данных
+ */
+public class Stack<T> {
+    private StackNode<T> top;    // вершина стека (здесь удаляем и добавляем)
+    private int size;             // количество элементов
+
+    // Конструктор
+    public Stack() {
+        top = null;
+        size = 0;
+    }
+
+    /**
+     * Добавить элемент на вершину стека - O(1)
+     * @param item элемент для добавления
+     */
+    public void push(T item) {
+        StackNode<T> newNode = new StackNode<>(item);
+        newNode.next = top;
+        top = newNode;
+        size++;
+    }
+
+    /**
+     * Удалить и вернуть элемент с вершины стека - O(1)
+     * @return удалённый элемент
+     * @throws RuntimeException если стек пуст
+     */
+    public T pop() {
+        if (isEmpty()) {
+            throw new RuntimeException("Stack is empty");
+        }
+        T item = top.data;
+        top = top.next;
+        size--;
+        return item;
+    }
+
+    /**
+     * Посмотреть элемент на вершине без удаления - O(1)
+     * @return элемент на вершине
+     * @throws RuntimeException если стек пуст
+     */
+    public T peek() {
+        if (isEmpty()) {
+            throw new RuntimeException("Stack is empty");
+        }
+        return top.data;
+    }
+
+    /**
+     * Проверить, пуст ли стек - O(1)
+     * @return true если стек пуст, иначе false
+     */
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
+    /**
+     * Получить количество элементов в стеке - O(1)
+     * @return размер стека
+     */
+    public int size() {
+        return size;
+    }
+
+    /**
+     * Очистить стек - O(1)
+     */
+    public void clear() {
+        top = null;
+        size = 0;
+    }
+
+    /**
+     * Проверить, содержится ли элемент в стеке - O(n)
+     * @param item искомый элемент
+     * @return true если элемент найден, иначе false
+     */
+    public boolean contains(T item) {
+        StackNode<T> current = top;
+        while (current != null) {
+            if (current.data.equals(item)) {
+                return true;
+            }
+            current = current.next;
+        }
+        return false;
+    }
+
+    /**
+     * Преобразовать стек в массив - O(n)
+     * @return массив с элементами стека (от вершины к дну)
+     */
+    @SuppressWarnings("unchecked")
+    public T[] toArray() {
+        T[] array = (T[]) new Object[size];
+        StackNode<T> current = top;
+        for (int i = 0; i < size; i++) {
+            array[i] = current.data;
+            current = current.next;
+        }
+        return array;
+    }
+
+    /**
+     * Красивый вывод стека (вершина → дно)
+     * @return строковое представление стека
+     */
+    @Override
+    public String toString() {
+        if (isEmpty()) {
+            return "Stack[]";
+        }
+        StringBuilder sb = new StringBuilder("Stack[TOP → ");
+        StackNode<T> current = top;
+        while (current != null) {
+            sb.append(current.data);
+            if (current.next != null) {
+                sb.append(", ");
+            }
+            current = current.next;
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+
+    /**
+     * Демонстрация работы стека
+     */
+    public static void main(String[] args) {
+        System.out.println("=== Демонстрация работы стека (Integer) ===\n");
+        
+        Stack<Integer> stack = new Stack<>();
+        
+        System.out.println("1. Добавляем элементы (push):");
+        stack.push(10);
+        System.out.println("   push(10) → " + stack);
+        stack.push(20);
+        System.out.println("   push(20) → " + stack);
+        stack.push(30);
+        System.out.println("   push(30) → " + stack);
+        stack.push(40);
+        System.out.println("   push(40) → " + stack);
+        
+        System.out.println("\n2. Размер стека: " + stack.size());
+        
+        System.out.println("\n3. Просмотр вершины (peek): " + stack.peek());
+        System.out.println("   Стек после peek: " + stack);
+        
+        System.out.println("\n4. Удаление элементов (pop):");
+        System.out.println("   pop() → " + stack.pop());
+        System.out.println("   Стек: " + stack);
+        System.out.println("   pop() → " + stack.pop());
+        System.out.println("   Стек: " + stack);
+        
+        System.out.println("\n5. Проверка наличия элементов (contains):");
+        System.out.println("   contains(10): " + stack.contains(10));
+        System.out.println("   contains(30): " + stack.contains(30));
+        
+        System.out.println("\n6. Преобразование в массив (toArray):");
+        Integer[] arr = stack.toArray();
+        System.out.print("   Массив: [");
+        for (int i = 0; i < arr.length; i++) {
+            System.out.print(arr[i]);
+            if (i < arr.length - 1) System.out.print(", ");
+        }
+        System.out.println("]");
+        
+        System.out.println("\n7. Очистка стека (clear):");
+        stack.clear();
+        System.out.println("   После clear: " + stack);
+        System.out.println("   isEmpty(): " + stack.isEmpty());
+        
+        System.out.println("\n=== Работа со стеком (String) ===\n");
+        Stack<String> strStack = new Stack<>();
+        strStack.push("Первый");
+        strStack.push("Второй");
+        strStack.push("Третий");
+        System.out.println("Стек строк: " + strStack);
+        System.out.println("pop(): " + strStack.pop());
+        System.out.println("После pop: " + strStack);
+        
+        System.out.println("\n=== Проверка исключений ===");
+        Stack<Integer> emptyStack = new Stack<>();
+        try {
+            emptyStack.pop();
+        } catch (RuntimeException e) {
+            System.out.println("   Ошибка при pop(): " + e.getMessage());
+        }
+        try {
+            emptyStack.peek();
+        } catch (RuntimeException e) {
+            System.out.println("   Ошибка при peek(): " + e.getMessage());
+        }
+    }
+}
